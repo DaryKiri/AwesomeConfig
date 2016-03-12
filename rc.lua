@@ -489,6 +489,9 @@ awful.rules.rules = {
     --Mapear thunar a files a screen 1 tag 1 "files"
     { rule = { class = "Thunar" },
     properties = { tag = tags[1][1] } },
+    --Mapear cliente idea a dev a screen 1 tag 5 "dev1"
+    { rule = { class = "jetbrains-idea-ce" },
+    properties = { tag = tags[1][5] } },
 }
 -- }}}
 
