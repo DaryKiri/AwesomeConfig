@@ -75,7 +75,22 @@ theme.titlebar_maximized_button_focus_active  = "/usr/share/awesome/themes/defau
 
 --Wallpaper anterior
 --theme.wallpaper = "/usr/share/awesome/themes/default/background.png"
-theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background1.png"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background1.png"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background2.jpg"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background3.jpg"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background4.png"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background5.jpg"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background6.jpg"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background7.jpg"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background8.png"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background9.png"
+theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background10.png" --rem
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background11.png"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background12.jpg"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background13.jpg"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background14.jpg"
+--theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background15.png" --ram
+
 
 -- You can use your own layout icons like this:
 theme.layout_fairh = "/usr/share/awesome/themes/default/layouts/fairhw.png"

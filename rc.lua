@@ -492,6 +492,8 @@ awful.rules.rules = {
     --Mapear cliente idea a dev a screen 1 tag 5 "dev1"
     { rule = { class = "jetbrains-idea-ce" },
     properties = { tag = tags[1][5] } },
+    {rule = { class = "notepadqq-bin" },
+    properties = { tag = tags[1][4] } },
 }
 -- }}}
 
