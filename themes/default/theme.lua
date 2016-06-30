@@ -4,6 +4,8 @@
 
 theme = {}
 
+local home_env = os.getenv("HOME") --
+
 theme.font          = "sans 8"
 
 theme.bg_normal     = "#222222"
@@ -73,8 +75,13 @@ theme.titlebar_maximized_button_focus_inactive  = "/usr/share/awesome/themes/def
 theme.titlebar_maximized_button_normal_active = "/usr/share/awesome/themes/default/titlebar/maximized_normal_active.png"
 theme.titlebar_maximized_button_focus_active  = "/usr/share/awesome/themes/default/titlebar/maximized_focus_active.png"
 
---Wallpaper anterior
+--Default Wallpaper
 --theme.wallpaper = "/usr/share/awesome/themes/default/background.png"
+
+--Index meanings for background#.png:
+--[[
+    1-
+--]]
 --theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background1.png"
 --theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background2.jpg"
 --theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background3.jpg"
@@ -84,7 +91,7 @@ theme.titlebar_maximized_button_focus_active  = "/usr/share/awesome/themes/defau
 --theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background7.jpg"
 --theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background8.png"
 --theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background9.png"
-theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background10.png" --rem
+theme.wallpaper = home_env .. "/.config/awesome/themes/default/background10.png" --rem
 --theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background11.png"
 --theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background12.jpg"
 --theme.wallpaper = "/home/daryl/.config/awesome/themes/default/background13.jpg"
