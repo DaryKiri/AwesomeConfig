@@ -10,16 +10,18 @@ local beautiful = require("beautiful")
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
---Mi widget de volumen
+-- Library for widgets
+local vicious = require("vicious")
+-- Library for key cheatsheet
+local keydoc = require("keydoc")
+-- Library for dynamic tags
+local eminent = require("eminent")
+
+-- Own imported libraries
 require("volumeWidget")
 
------------------------------ LIBRERIAS PROPIAS IMPORTADAS------------------------------------------
---Libreria vicious para widgets
-local vicious = require("vicious")
---Libreria para documentar keybinds usados
-local keydoc = require("keydoc")
---Permite usar tags dinamicamente
-local eminent = require("eminent") 
+
+local home_env = os.getenv("HOME")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -48,8 +50,8 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
---beautiful.init("/usr/share/awesome/themes/default/theme.lua")
-beautiful.init(os.getenv("HOME") .. "/.config/awesome/themes/default/theme.lua")
+--beautiful.init("/usr/share/awesome/themes/default/theme.lua") --default theme
+beautiful.init(home_env .. "/.config/awesome/themes/default/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
 terminal = "xfce4-terminal"
@@ -143,10 +145,11 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- Create a textclock widget
 mytextclock = awful.widget.textclock()
 
---Crear un widget de volumen de sonido
+--Create widget of volume
 mytextvolume = create_volume_widget_text()
 
---Crear widget de batteria
+--Create widget of battery
+--Is not working
 batterywidget = wibox.widget.textbox()    
 batterywidget:set_text(" | Battery | ")    
 batterywidgettimer = timer({ timeout = 5 })    
@@ -159,13 +162,12 @@ batterywidgettimer:connect_signal("timeout",
 )    
 --batterywidgettimer:start()
 
-
 -- Create a wibox for each screen and add it
-mywibox = {}
+mywibox = {} --Top wibox
 mypromptbox = {}
 mylayoutbox = {}
 mytaglist = {}
---Creacion de wibox abajo del todo----
+--Create bottom wibox
 mybottomwibox = {}
 --------------------------------------
 mytaglist.buttons = awful.util.table.join(
@@ -242,7 +244,7 @@ for s = 1, screen.count() do
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
-    --right_layout:add(netwidget) --Cambiado UNCOMENT FOR USAGE
+    --right_layout:add(netwidget) -- UNCOMENT FOR USAGE
     right_layout:add(mytextvolume)
     right_layout:add(mytextclock)
     right_layout:add(mylayoutbox[s])
@@ -254,11 +256,10 @@ for s = 1, screen.count() do
     layout:set_right(right_layout)
 
     mywibox[s]:set_widget(layout)
-    
-    --Prueba de dos wibox
+
     -- Create the bottom wibox
     mybottomwibox[s] = awful.wibox({ position = "bottom", screen = s, border_width = 0, height = 18 })
-    bottom_layout = wibox.layout.align.horizontal()
+    local bottom_layout = wibox.layout.align.horizontal()
     bottom_layout:set_middle(mytasklist[s])
     --bottom_layout:set_right(batterywidget)
     mybottomwibox[s]:set_widget(bottom_layout)
@@ -268,44 +269,44 @@ end
 
 -- {{{ Mouse bindings
 root.buttons(awful.util.table.join(
+    --Right click keys
     awful.button({ }, 3, function () mymainmenu:toggle() end),
+    --Mouse wheel keys
     awful.button({ }, 4, awful.tag.viewnext),
     awful.button({ }, 5, awful.tag.viewprev)
 ))
 -- }}}
 
----------------------------------ATAJOS DEL TECLADO------------------------
 -- {{{ Key bindings
 globalkeys = awful.util.table.join( 
-    keydoc.group("Manipulacion del Layout"),
-    awful.key({ modkey, 	  }, "g",      keydoc.display, "Guia atajos"),
+    keydoc.group("Layout Manipulation"),
+    awful.key({ modkey, 	  }, "g",      keydoc.display, "Cheat sheet"),
     awful.key({ }, "Print", 
         function () 
             local date =os.date("%Y_%m_%d-%H_%M_%S") 
             local cmd =  "import -window root ~/Pictures/Screenshot_"..date..".png"
             awful.util.spawn_with_shell(cmd) 
             naughty.notify({text=cmd})
-        end, "Captura de Pantalla"),
-    awful.key({ modkey,           }, "Left",   awful.tag.viewprev, "Tag anterior"),
-    awful.key({ modkey,           }, "Right",  awful.tag.viewnext, "Tag siguiente"),
-    awful.key({ modkey,           }, "Escape", awful.tag.history.restore, "Volver a Tag reciente"),
+        end, "Screenshot"),
+    awful.key({ modkey,           }, "Left",   awful.tag.viewprev, "Focus Previous Tag"),
+    awful.key({ modkey,           }, "Right",  awful.tag.viewnext, "Focus Next Tag"),
+    awful.key({ modkey,           }, "Escape", awful.tag.history.restore, "Focus previously selected Tag"),
 
     awful.key({ modkey,           }, "j",
         function ()
             awful.client.focus.byidx( 1)
             if client.focus then client.focus:raise() end
-        end, "Focus Ventana siguiente"),
+        end, "Focus next window"),
     awful.key({ modkey,           }, "k",
         function ()
             awful.client.focus.byidx(-1)
             if client.focus then client.focus:raise() end
-        end, "Focus Ventana anterior"),
---    awful.key({ modkey,           }, "w", function () mymainmenu:show() end, "Mostrar menu"),
+        end, "Focus previous window"),
 
     -- Layout manipulation
-    awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end, "Orden ventana izquierda"),
-    awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end, "Orden ventana derecha"),
--------------------------------FOCUS SOLO SI SE USA DOBLE SCREEN-----------------------------------------------------
+    awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end, "Switch client with next client"),
+    awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end, "Switch client with previous client"),
+-------------------------------Only when using multiple screens-----------------------------------------------------
 --    awful.key({ modkey, "Control" }, "j", function () awful.screen.focus_relative( 1) end),
 --    awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end),
 --    awful.key({ modkey,           }, "u", awful.client.urgent.jumpto),
@@ -315,45 +316,45 @@ globalkeys = awful.util.table.join(
             if client.focus then
                 client.focus:raise()
             end
-        end, "Volver a ventana anterior"),
+        end, "Switch to previous focused client"),
 
     
-    keydoc.group("Atajos Volumen"),
-    --Keys para aumentar volumen 
+    keydoc.group("Volume"),
+    --Keys used to manage volume
 --awful.key({ }, "XF86AudioRaiseVolume", function ()
---   awful.util.spawn("amixer set Master 5%+", false) end, "Subir el volumen"),
+--   awful.util.spawn("amixer set Master 5%+", false) end, "Increase volume"),
 --awful.key({ }, "XF86AudioLowerVolume", function ()
---   awful.util.spawn("amixer set Master 5%-", false) end, "Bajar el volumen"),
+--   awful.util.spawn("amixer set Master 5%-", false) end, "Decrease volume"),
 --awful.key({ }, "XF86AudioMute", function ()
---   awful.util.spawn("amixer set Master toggle", false) end, "Mutear el volumen"),
+--   awful.util.spawn("amixer set Master toggle", false) end, "Mute volume"),
 
   awful.key({ }, "XF86AudioRaiseVolume", function ()
-     inc_vol(mytextvolume) end, "Subir el volumen"),
+     inc_vol(mytextvolume) end, "Increase volume"),
   awful.key({ }, "XF86AudioLowerVolume", function ()
-     decr_vol(mytextvolume) end, "Bajar el volumen"),
+     decr_vol(mytextvolume) end, "Decrease volume"),
   awful.key({ }, "XF86AudioMute", function ()
-     mute_vol(mytextvolume) end, "Mutear el volumen"),
+     mute_vol(mytextvolume) end, "Mute volume"),
 
     -- Standard program
-    keydoc.group("Atajos estandares"),
+    keydoc.group("Standart"),
 
-    awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end, "Abrir terminal"),
-    awful.key({ modkey, "Control" }, "r", awesome.restart, "Reiniciar Awesome"),
-    awful.key({ modkey, "Shift"   }, "q", awesome.quit, "Quitar Awesome"),
+    awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end, "Open terminal"),
+    awful.key({ modkey, "Control" }, "r", awesome.restart, "Restart Awesome"),
+    awful.key({ modkey, "Shift"   }, "q", awesome.quit, "Quit Awesome"),
 
-    awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end, "Aumentar tamano ventana"),
-    awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end, "Decrementar tamano ventana"),
+    awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end, "Increase master width"),
+    awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end, "Decrease master width"),
 --    awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1)      end),
 --    awful.key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1)      end),
 --    awful.key({ modkey, "Control" }, "h",     function () awful.tag.incncol( 1)         end),
 --    awful.key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1)         end),
-    awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end, "Cambiar layout"),
+    awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end, "Change layout"),
 --    awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 
-    awful.key({ modkey, "Control" }, "n", awful.client.restore, "Restaurar"),
+    awful.key({ modkey, "Control" }, "n", awful.client.restore, "Restore client"),
 
     -- Prompt
-    awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end, "Correr una aplicacion"),
+    awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end, "Run prompt"),
 
     awful.key({ modkey }, "x",
               function ()
@@ -361,30 +362,30 @@ globalkeys = awful.util.table.join(
                   mypromptbox[mouse.screen].widget,
                   awful.util.eval, nil,
                   awful.util.getdir("cache") .. "/history_eval")
-              end, "Correr codigo Lua"),
+              end, "Run lua code"),
     -- Menubar
-    awful.key({ modkey }, "p", function() menubar.show() end, "Barra de menu")
+    awful.key({ modkey }, "p", function() menubar.show() end, "Menubar")
 )
     
 clientkeys = awful.util.table.join(
-    keydoc.group("Atajos de ventana"),
-    awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end, "Pantalla completa"),
-    awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end, "Matar ventana"),
-    awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     , "Convertir en floating"),
+    keydoc.group("Client"),
+    awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end, "Fullscreen"),
+    awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end, "Kill client"),
+    awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     , "Toggle client floating"),
     awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),
     awful.key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
-    awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end, "Poner ventana en top"),
+    awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end, "Set client on-top"),
     awful.key({ modkey,           }, "n",
         function (c)
             -- The client currently has the input focus, so it cannot be
             -- minimized, since minimized clients can't have the focus.
             c.minimized = true
-        end, "Minimizar ventana"),
+        end, "Minimize client"),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal
             c.maximized_vertical   = not c.maximized_vertical
-        end, "Maximizar ventana")
+        end, "Maximize client")
 )
 
 -- Bind all key numbers to tags.
@@ -441,7 +442,7 @@ clientbuttons = awful.util.table.join(
 root.keys(globalkeys)
 -- }}}
 
--------------------REGLAS PARA CADA VENTANA INICIADA---------------------
+
 -- {{{ Rules
 -- Rules to apply to new clients (through the "manage" signal).
 awful.rules.rules = {
@@ -452,8 +453,8 @@ awful.rules.rules = {
                      focus = awful.client.focus.filter,
                      raise = true,
                      keys = clientkeys,
-		     maximized_vertical   = false, --Cambiado evita que firefox inicie en pantalla completa
- 		     maximized_horizontal = false, --Cambiado
+		     maximized_vertical   = false, --Ensure firefox doesn't initialize on fullscreen mode
+ 		     maximized_horizontal = false,
                      buttons = clientbuttons } },
     { rule = { class = "MPlayer" },
       properties = { floating = true } },
@@ -462,36 +463,37 @@ awful.rules.rules = {
     { rule = { class = "gimp" },
       properties = { floating = true } },
 
-------GUIA DE MAPEADO------------------------------------------------------------------------
+------Guide to choose tag-----------------------------------------------------------------------
     -- "files" = 1, "web1" = 2, "web2" = 3, "dev1" = 4, "dev2" = 5, "social" = 6, "other" = 7
-    
-    -- Mapear luakit a screen 1 tag 3 "web2"
+
+    -- Bind luakit to screeen 1 tag 3 "web1"
     { rule = { class = "luakit" },
-    properties = { tag = tags[1][3] } }, 
-    -- Mapear la aplicacion de Firefox a screen 1 tag 2 y hacer que sea floating
+    properties = { tag = tags[1][3] } },
+    -- Bind firefox to screen 1 tag 2 and start it with floating status
     { rule = { class = "Firefox" },
-    properties = { tag = tags[1][2], floating = true  } }, 
-    -- Mapear la aplicacion Skype a screen 1 tag 6 "Social"
+    properties = { tag = tags[1][2], floating = true  } },
+    -- Bind skype to screen 1 tag 6 "social"
     { rule = { class = "Skype" },
     properties = { tag = tags[1][6] } },
-    --Mapear eclipse a screen 1 tag 5 "dev2"
+    -- Bind eclipse to screen 1 tag 5 "dev1"
     { rule = { class = "Eclipse" },
     properties = { tag = tags[1][5] } },
-    -- Mapear cliente android studio a screen 1 tag 5 "dev2"
+    --Bind android studio to screen 1 tag 5 "dev1"
     { rule = { class = "jetbrains-studio" },
     properties = { tag = tags[1][5] } },
-    --Mapear Light Table a screen 1 tag 4 "dev1"
+    -- Bind Light Table to screen 1 tag 4 "dev"
     { rule = { class = "LightTable" },
     properties = { tag = tags[1][4] } },
-    --Mapear cliente gedit a screen 1 tag 4 "dev1"
+    -- Bind gedit to screen 1 tag 4 "dev"
     { rule = { class = "Gedit" },
     properties = { tag = tags[1][4] } },
-    --Mapear thunar a files a screen 1 tag 1 "files"
+    -- Bind thunar to screem 1 tag 1 "files"
     { rule = { class = "Thunar" },
     properties = { tag = tags[1][1] } },
-    --Mapear cliente idea a dev a screen 1 tag 5 "dev1"
+    -- Bind idea to screen 1 tag 5 "dev1"
     { rule = { class = "jetbrains-idea-ce" },
     properties = { tag = tags[1][5] } },
+    -- Bind notepadqq to screen 1 tag 4 "dev"
     {rule = { class = "notepadqq-bin" },
     properties = { tag = tags[1][4] } },
 }

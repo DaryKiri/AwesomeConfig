@@ -1,65 +1,59 @@
--- Propio Script para widget volumen contiene las funciones necesarias para que mi widget funcione
--- Creado por: DaryKiri
--- Solo para Amixer, tambien puedes acomodarlo a tu gusto
--- Instrucciones de uso:
--- 	Crear el widget con create_volume_widget_text()
--- 	Incorporar los botones con cada funcion de aumentar, decrementar y mutear el sonido
--- 	Meter el widget en el wibox
+-- Created by: DaryKiri
+-- Requires Amixer
+-- How to use:
+-- 	Create a variable that uses this widget using: create_volume_widget_text()
+-- 	Afert that, insert it on the wiibox
 
 local awful = require("awful")
 local wibox = require("wibox")
 
---Funcion para obtener el volumen desde amixer
+--Functions to get information about the volume
 function get_volume()
-	--He usado $5 alomejor, no funciona en otros ordenadores
-	local fich = io.popen("amixer get Master |grep % |awk '{print $5}'|sed 's/[^0-9]//g' | sed '1d'")
-	vol_string = fich:read("*l")
-	fich:close()
+	--Using $5, It may not get the expected output if using another version of amixer
+	local fd = io.popen("amixer get Master |grep % |awk '{print $5}'|sed 's/[^0-9]//g' | sed '1d'")
+	local vol_string = fd:read("*l")
+	fd:close()
 	return vol_string
 end
 
---Funcion para obtener si esta muteado o no
 function get_mute()
-	--He usado $6 alomejor, no funciona en otros ordenadores
-	local fich1 = io.popen("amixer get Master | grep % | awk '{print $6}' | sed '1d' | tr -d '[]'")
-	mute_string = fich1:read("*l")
-	fich1:close()
+	--Using $6, It may not get the expected output if using another version of amixer
+	local fd = io.popen("amixer get Master | grep % | awk '{print $6}' | sed '1d' | tr -d '[]'")
+	local mute_string = fd:read("*l")
+	fd:close()
 	return tostring(mute_string)
 end
 
---Funcion para updatear el widget
+--Functions to update and change the volume
 function update(widget)
-	volumen = get_volume()
-	mute    = get_mute()
+	local volumen = get_volume()
+	local mute    = get_mute()
 	if mute == "off" then
-	   widget:set_text("Vol:" .. mute) 
+	   widget:set_text("Vol:" .. mute)
 	else 
-	   widget:set_text( "Vol:" .. volumen .. "/100" ) 
+	   widget:set_text( "Vol:" .. volumen .. "/100" )
 	end
 end
 
---Funcion para aumentar el volumen
 function inc_vol(widget)
 	awful.util.spawn("amixer set Master 5%+", false)
 	update(widget)
 end
 
---Funcion para decrementar volumen
 function decr_vol(widget)
 	awful.util.spawn("amixer set Master 5%-", false)
 	update(widget)
 end
 
---Funcion para mutear el volumen
 function mute_vol(widget)
 	awful.util.spawn("amixer set Master toggle", false)
 	update(widget)
 end
 
---Funcion que crea el widget version texto
+--Creates de widget
 function create_volume_widget_text()
-	vol_widget = wibox.widget.textbox()
-	--Updateamos el widget
+	local vol_widget = wibox.widget.textbox()
+	--Updatting the widget
 	update(vol_widget)
 	return vol_widget
 end
