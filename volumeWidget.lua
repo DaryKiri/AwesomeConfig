@@ -36,12 +36,12 @@ function update(widget)
 end
 
 function inc_vol(widget)
-	awful.util.spawn("amixer set Master 5%+", false)
+	awful.util.spawn("amixer set Master 1%+", false)
 	update(widget)
 end
 
 function decr_vol(widget)
-	awful.util.spawn("amixer set Master 5%-", false)
+	awful.util.spawn("amixer set Master 1%-", false)
 	update(widget)
 end
 

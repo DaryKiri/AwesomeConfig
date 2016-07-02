@@ -1,26 +1,36 @@
+--[[
+    Some code are adapted from:
+    Multicolor Awesome WM config 2.0
+    github.com/copycat-killer
+--]]
+
+
+-- {{{ Imported libraies
 -- Standard awesome library
-local gears = require("gears")
-local awful = require("awful")
-awful.rules = require("awful.rules")
-require("awful.autofocus")
+local gears     = require("gears")
+local awful     = require("awful")
+awful.rules     = require("awful.rules")
+                  require("awful.autofocus")
 -- Widget and layout library
-local wibox = require("wibox")
+local wibox     = require("wibox")
 -- Theme handling library
 local beautiful = require("beautiful")
 -- Notification library
-local naughty = require("naughty")
-local menubar = require("menubar")
+local naughty   = require("naughty") --Set to global or not
+local menubar   = require("menubar")
 -- Library for widgets
-local vicious = require("vicious")
+--local vicious   = require("vicious")
 -- Library for key cheatsheet
-local keydoc = require("keydoc")
+local keydoc    = require("keydoc")
 -- Library for dynamic taggging
-local eminent = require("eminent")
-
+local eminent   = require("eminent")
+--Lain library
+local lain      = require("lain")
 -- Own imported libraries
-require("volumeWidget")
+                  require("volumeWidget")
+-- }}}
 
-
+-- Local variables for future use
 local home_env = os.getenv("HOME")
 
 -- {{{ Error handling
@@ -136,12 +146,6 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 
 -- {{{ Wibox
 
---  Network usage widget only for ethernet Uncoment for usage
---netwidget = wibox.widget.textbox()
--- Register widget
---vicious.register(netwidget, vicious.widgets.net, '<span color="#CC9393">${eth0 down_kb}</span> <span color="#7F9F7F">${eth0 up_kb}</span>', 3)
-
-
 -- Create a textclock widget
 mytextclock = awful.widget.textclock()
 
@@ -248,7 +252,6 @@ for s = 1, screen.count() do
     -- Widgets that are aligned to the upper right
     local right_layout = wibox.layout.fixed.horizontal()
     --if s == 1 then right_layout:add(wibox.widget.systray()) end
-    --right_layout:add(netwidget) -- UNCOMENT FOR USAGE
     right_layout:add(mytextvolume)
     right_layout:add(mytextclock)
     right_layout:add(mylayoutbox[s])
@@ -296,10 +299,11 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, 	  }, "g",      keydoc.display, "Cheat sheet"),
     awful.key({ }, "Print", 
         function () 
-            local date =os.date("%Y_%m_%d-%H_%M_%S") 
-            local cmd =  "import -window root ~/Pictures/Screenshot_"..date..".png"
-            awful.util.spawn_with_shell(cmd) 
-            naughty.notify({text=cmd})
+            local title_out = "Screenshot taken"
+            local text_out = "Saved on: " .. home_env .. "/Pictures/Screenshot"
+            local cmd =  home_env .. "/.config/awesome/scripts/screenshot.sh"
+            awful.util.spawn_with_shell(cmd)
+            naughty.notify({title=title_out, text=text_out})
         end, "Screenshot"),
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev, "Focus Previous Tag"),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext, "Focus Next Tag"),
@@ -535,7 +539,7 @@ client.connect_signal("manage", function (c, startup)
         end
     end
 
-    local titlebars_enabled = false
+    local titlebars_enabled = false --Enable tilebar for each clients
     if titlebars_enabled and (c.type == "normal" or c.type == "dialog") then
         -- buttons for the titlebar
         local buttons = awful.util.table.join(
@@ -581,6 +585,35 @@ client.connect_signal("manage", function (c, startup)
     end
 end)
 
+-- No border for maximized or single clients
+client.connect_signal("focus",
+    function(c)
+        if c.maximized_horizontal == true and c.maximized_vertical == true then
+            c.border_width = 0
+        elseif #awful.client.visible(mouse.screen) > 1 then
+            c.border_width = beautiful.border_width
+            c.border_color = beautiful.border_focus
+        end
+    end)
+client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+-- }}}
+
+-- {{{ Arrange signal handler
+for s = 1, screen.count() do screen[s]:connect_signal("arrange",
+    function ()
+        local clients = awful.client.visible(s)
+        local layout  = awful.layout.getname(awful.layout.get(s))
+
+        if #clients > 0 then
+            for _, c in pairs(clients) do -- Floaters always have borders
+            if awful.client.floating.get(c) or layout == "floating" then
+                c.border_width = beautiful.border_width
+            end
+            end
+        end
+    end)
+end
+-- }}}
+
 --client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 --client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
--- }}}
