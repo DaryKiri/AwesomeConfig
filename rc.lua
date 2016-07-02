@@ -14,7 +14,7 @@ local menubar = require("menubar")
 local vicious = require("vicious")
 -- Library for key cheatsheet
 local keydoc = require("keydoc")
--- Library for dynamic tags
+-- Library for dynamic taggging
 local eminent = require("eminent")
 
 -- Own imported libraries
@@ -97,7 +97,7 @@ end
 -- {{{ Tags
 -- Define a tag table which hold all screen tags.
 tags = {
-	names = { "1-FILE", "2-WEB", "3-WEB1", "4-DEV", "5-DEV1", "6-SOCI", "7-OTH" },
+	names = { "file", "www", "www1", "dev", "dev1", "soc", "oth" },
 	layout = { layouts[9], layouts[8], layouts[8], layouts[1], layouts[1], layouts[6],
 		   layouts[2] }
 }
@@ -164,11 +164,12 @@ batterywidgettimer:connect_signal("timeout",
 
 -- Create a wibox for each screen and add it
 mywibox = {} --Top wibox
+--Create bottom wibox
+mybottomwibox = {}
 mypromptbox = {}
 mylayoutbox = {}
 mytaglist = {}
---Create bottom wibox
-mybottomwibox = {}
+
 --------------------------------------
 mytaglist.buttons = awful.util.table.join(
                     awful.button({ }, 1, awful.tag.viewonly),
@@ -216,8 +217,10 @@ mytasklist.buttons = awful.util.table.join(
                                           end))
 
 for s = 1, screen.count() do
+
     -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt()
+
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     mylayoutbox[s] = awful.widget.layoutbox(s)
@@ -226,24 +229,25 @@ for s = 1, screen.count() do
                            awful.button({ }, 3, function () awful.layout.inc(layouts, -1) end),
                            awful.button({ }, 4, function () awful.layout.inc(layouts, 1) end),
                            awful.button({ }, 5, function () awful.layout.inc(layouts, -1) end)))
+
     -- Create a taglist widget
     mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.filter.all, mytaglist.buttons)
 
     -- Create a tasklist widget
     mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
 
-    -- Create the wibox
+    -- Create the upper wibox
     mywibox[s] = awful.wibox({ position = "top", height = "20", screen = s })
 
-    -- Widgets that are aligned to the left
+    -- Widgets that are aligned to the upper left
     local left_layout = wibox.layout.fixed.horizontal()
     left_layout:add(mylauncher)
     left_layout:add(mytaglist[s])
     left_layout:add(mypromptbox[s])
 
-    -- Widgets that are aligned to the right
+    -- Widgets that are aligned to the upper right
     local right_layout = wibox.layout.fixed.horizontal()
-    if s == 1 then right_layout:add(wibox.widget.systray()) end
+    --if s == 1 then right_layout:add(wibox.widget.systray()) end
     --right_layout:add(netwidget) -- UNCOMENT FOR USAGE
     right_layout:add(mytextvolume)
     right_layout:add(mytextclock)
@@ -252,16 +256,25 @@ for s = 1, screen.count() do
     -- Now bring it all together (with the tasklist in the middle)
     local layout = wibox.layout.align.horizontal()
     layout:set_left(left_layout)
-    --layout:set_middle(mytasklist[s]) -- Quitar tasklist de wibox de arriba
+    --layout:set_middle(mytasklist[s])
     layout:set_right(right_layout)
 
     mywibox[s]:set_widget(layout)
 
     -- Create the bottom wibox
-    mybottomwibox[s] = awful.wibox({ position = "bottom", screen = s, border_width = 0, height = 18 })
+    mybottomwibox[s] = awful.wibox({ position = "bottom", screen = s, border_width = 0, height = 20 })
+
+    local bottom_left_layout = wibox.layout.fixed.horizontal()
+
+    local bottom_right_layout = wibox.layout.fixed.horizontal()
+    if s == 1 then bottom_right_layout:add(wibox.widget.systray()) end --Only adds systray to screen 1
+
+    -- Now bring it all together (with tasklist in the middle)
     local bottom_layout = wibox.layout.align.horizontal()
+    bottom_layout:set_left(bottom_left_layout)
     bottom_layout:set_middle(mytasklist[s])
     --bottom_layout:set_right(batterywidget)
+    bottom_layout:set_right(bottom_right_layout)
     mybottomwibox[s]:set_widget(bottom_layout)
 
 end
