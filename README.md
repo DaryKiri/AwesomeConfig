@@ -1,7 +1,7 @@
 #Awesome Config
 
 This is a repository with my configuration of awesome wm, if you want to
-learn more about awesome wm, [click here]("https://awesome.naquadah.org/").
+learn more about awesome wm, [click here](https://awesome.naquadah.org/).
 
 ##**Contents**
 - rc.lua with my own configurations
