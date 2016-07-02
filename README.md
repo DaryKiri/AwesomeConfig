@@ -3,7 +3,7 @@
 This is a repository with my configuration of awesome wm, if you want to
 learn more about awesome wm, [click here]("https://awesome.naquadah.org/").
 
-**Contents:**
+**Contents**
 1. rc.lua with my own configurations
 2. keydoc widget, displays a mini key cheat sheet
 3. volumeWidget, a simple widget that displays the percentage of volume
