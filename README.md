@@ -2,19 +2,15 @@
 
 This is a repository with my configuration of awesome wm, if you want to
 learn more about awesome wm, [click here](https://awesome.naquadah.org/).
+This rc.lua has some code adapted from [awesome-copycats](https://github.com/copycat-killer/awesome-copycats).
 
 ##**Contents**
-- rc.lua with my own configurations
 - keydoc widget, displays a mini key cheat sheet
-- volumeWidget, a simple widget that displays the percentage of volume
 
 ##**Usage**
 Just download the .zip and extract it on _".config/awesome"_ or clone the
 repository to _".config/awesome"_ directory.
 
-##**To do**
-- [ ] Add more widgets
-- [ ] Change icons and style of the theme
 
 
 
