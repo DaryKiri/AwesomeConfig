@@ -8,6 +8,7 @@ local math      = math
 local string    = string
 local type      = type
 local modkey    = "Mod4"
+local altkey    = "Mod1"
 local beautiful = require("beautiful")
 local naughty   = require("naughty")
 local capi      = {
@@ -53,6 +54,7 @@ local function key2str(key)
    local translate = {
       --[modkey] = "⊞",
       [modkey] = "Win",
+      [altkey] = "Alt",
       Shift    = "Shift",
       Control  = "Ctrl",
    }
