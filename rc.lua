@@ -1,7 +1,8 @@
 --[[
-    Some code are adapted from:
     Multicolor Awesome WM config 2.0
     github.com/copycat-killer
+
+    Modified by: DaryKiri
 --]]
 
 -- {{{ Imported libraies
@@ -60,8 +61,7 @@ end
 -- {{{ Variable definitions
 
 -- Themes define colours, icons, font and wallpapers.
---beautiful.init("/usr/share/awesome/themes/default/theme.lua") --default theme
---beautiful.init(home_env .. "/.config/awesome/themes/default/theme.lua")
+-- beautiful.init(home_env .. "/.config/awesome/themes/default/theme.lua")
 beautiful.init(home_env .. "/.config/awesome/themes/multicolor/theme.lua")
 
 
@@ -71,10 +71,12 @@ terminal    = "xfce4-terminal" or "xterm"
 editor      = os.getenv("EDITOR") or "nano"
 editor_cmd  = terminal .. " -e " .. editor
 
+--TODO add more default programs
 browser     = "firefox"
 browser1    = "opera"
 --ide         = "idea"
 
+--TODO try lain layouts
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =
 {
@@ -95,7 +97,8 @@ local layouts =
 --quake terminal
 local quakeconsole = {}
 for s = 1, screen.count() do
-    quakeconsole[s] = lain.util.quake({app = terminal})
+    --Only works applications that accept to be given a name trough the command line (like xterm or rxvt)
+    quakeconsole[s] = lain.util.quake({app = "xterm", screen = s, height = 0.3})
 end
 -- }}}
 
@@ -118,7 +121,7 @@ for s = 1, screen.count() do
 end
 -- }}}
 
--- {{{ Menu MODIFY LATER
+-- {{{ Menu --TODO Modify later
 -- Create a laucher widget and a main menu
 myawesomemenu = {
    { "manual", terminal .. " -e man awesome" },
@@ -148,6 +151,7 @@ mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 -- }}}
+
 -- {{{ Wibox
 markup = lain.util.markup
 
@@ -239,7 +243,7 @@ memwidget = lain.widgets.mem({
     end
 })
 
--- MPD widget
+-- MPD widget --TODO learn how to use mpd
 mpdicon = wibox.widget.imagebox()
 mpdwidget = lain.widgets.mpd({
     settings = function()
@@ -328,8 +332,7 @@ mytasklist.buttons = awful.util.table.join(
                                                   instance = nil
                                               else
                                                   instance = awful.menu.clients({
-                                                      --theme = { width = 250 }
-                                                      width=250 --Test
+                                                      width=250
                                                   })
                                               end
                                           end),
@@ -443,23 +446,36 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore, "Focus previously selected Tag"),
 
     keydoc.group("Client manipulation"),
+    --Default manipulation
+    awful.key({ modkey,           }, "j",
+        function ()
+            awful.client.focus.byidx( 1)
+            if client.focus then client.focus:raise() end
+        end, "Focus next window"),
+    awful.key({ modkey,           }, "k",
+        function ()
+            awful.client.focus.byidx(-1)
+            if client.focus then client.focus:raise() end
+        end, "Focus previous window"),
+
     --By direction manipulation
-    awful.key({ modkey }, "j",
+    --TODO add keydocs or delete
+    awful.key({ altkey }, "j",
         function()
             awful.client.focus.bydirection("down")
             if client.focus then client.focus:raise() end
         end),
-    awful.key({ modkey }, "k",
+    awful.key({ altkey }, "k",
         function()
             awful.client.focus.bydirection("up")
             if client.focus then client.focus:raise() end
         end),
-    awful.key({ modkey }, "h",
+    awful.key({ altkey }, "h",
         function()
             awful.client.focus.bydirection("left")
             if client.focus then client.focus:raise() end
         end),
-    awful.key({ modkey }, "l",
+    awful.key({ altkey }, "l",
         function()
             awful.client.focus.bydirection("right")
             if client.focus then client.focus:raise() end
@@ -471,28 +487,6 @@ globalkeys = awful.util.table.join(
                 client.focus:raise()
             end
         end, "Switch to previous focused client"),
-
-    --[[ Default manipulation
-
-    awful.key({ modkey,           }, "j",
-        function ()
-            awful.client.focus.byidx( 1)
-            if client.focus then client.focus:raise() end
-        end, "Focus next window"),
-    awful.key({ modkey,           }, "k",
-        function ()
-            awful.client.focus.byidx(-1)
-            if client.focus then client.focus:raise() end
-        end, "Focus previous window"),
-    awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end, "Switch client with next client"),
-    awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end, "Switch client with previous client"),
-
-    -- Only when using multiple screens
-    --awful.key({ modkey, "Control" }, "j", function () awful.screen.focus_relative( 1) end),
-    --awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end),
-    --awful.key({ modkey,           }, "u", awful.client.urgent.jumpto),
-
-    --]]
     
 --[[ Old volume control
     --Keys used to manage volume
@@ -550,6 +544,14 @@ globalkeys = awful.util.table.join(
             awful.util.spawn_with_shell("mpc next || ncmpc next || pms next")
             mpdwidget.update()
         end, "Next song"),
+    awful.key({altkey, modkey}, "Up",
+        function()
+            awful.util.spawn_with_shell("mpc volume +1")
+        end, "Increase mpd volume"),
+    awful.key({altkey, modkey}, "Down",
+        function()
+            awful.util.spawn_with_shell("mpc volume -1")
+        end, "Decrease mpd volume"),
 
     keydoc.group("User programs"),
     awful.key({ modkey }, "q", function () awful.util.spawn(browser) end),

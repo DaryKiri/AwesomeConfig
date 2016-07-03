@@ -2,7 +2,11 @@
 --[[
                                                   
      Licensed under GNU General Public License v2 
-      * (c) 2013, Luke Bonham                     
+      * (c) 2013, Luke Bonham
+
+     Modified by: DaryKiri
+     Using output from lm_sensors
+     https://github.com/groeck/lm-sensors/tree/master/doc
                                                   
 --]]
 
@@ -10,7 +14,7 @@ local newtimer     = require("lain.helpers").newtimer
 
 local wibox        = require("wibox")
 
-local io           = { open = io.open }
+local io           = { open = io.open, popen = io.popen } --Added popen operation
 local tonumber     = tonumber
 
 local setmetatable = setmetatable
@@ -33,7 +37,14 @@ local function worker(args)
             coretemp_now = tonumber(f:read("*all")) / 1000
             f:close()
         else
-            coretemp_now = "N/A"
+            local f = io.popen("sensors | grep CPUTIN | awk '{print $2}' | sed 's/+//g' | sed 's/°C//g'") --Change if not obtaining expected value
+            if f then
+                coretemp_now = tonumber(f:read("*all"))
+                if coretemp_now == nil then coretemp_now = "N/A" end
+                f:close()
+            else
+                coretemp_now = "N/A" --test
+            end
         end
 
         widget = temp.widget

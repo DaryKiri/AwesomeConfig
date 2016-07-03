@@ -3,7 +3,7 @@
                                                    
      Licensed under GNU General Public License v2  
       * (c) 2016, Luke Bonham                      
-                                                   
+     Modified by: DaryKiri
 --]]
 
 local awful  = require("awful")
@@ -52,7 +52,8 @@ function quake:display()
 
    if not client then
       -- The client does not exist, we spawn it
-      awful.util.spawn(self.app .. " " .. string.format(self.argname, self.name),
+      --Changed font size and colours
+      awful.util.spawn(self.app .. " -rv -fn 7x13 -fa 'Liberation Mono:size=14:antialias=true' " .. string.format(self.argname, self.name),
       false, self.screen)
       return
    end
