@@ -76,7 +76,6 @@ browser     = "firefox"
 browser1    = "opera"
 --ide         = "idea"
 
---TODO try lain layouts
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =
 {
@@ -87,12 +86,19 @@ local layouts =
     awful.layout.suit.tile.top, --5
     awful.layout.suit.fair, --6
     awful.layout.suit.fair.horizontal, --7
---    awful.layout.suit.spiral,
---    awful.layout.suit.spiral.dwindle,
     awful.layout.suit.max, --8
---    awful.layout.suit.max.fullscreen,
-    awful.layout.suit.magnifier --9
+    awful.layout.suit.magnifier, --9
+    lain.layout.termfair, --10
+    lain.layout.centerfair, --11
+    lain.layout.centerwork, --12
+    lain.layout.centerhwork --13
 }
+
+-- Configurations for layouts of lain
+lain.layout.termfair.nmaster = 3
+lain.layout.termfair.ncol = 1
+lain.layout.centerfair.master = 3
+lain.layout.centerfair.ncol = 1
 
 --quake terminal
 local quakeconsole = {}
@@ -112,8 +118,8 @@ end
 
 -- {{{ Tags
 tags = {
-	names = { "file", "web", "web1", "dev", "dev1", "social", "other" },
-	layout = { layouts[9], layouts[8], layouts[8], layouts[1], layouts[1], layouts[6], layouts[2] }
+	names = { "file",      "web",      "web1",     "dev",      "dev1",     "social",   "other" },
+	layout = { layouts[9], layouts[8], layouts[8], layouts[11], layouts[1], layouts[6], layouts[2] }
 }
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
@@ -121,7 +127,7 @@ for s = 1, screen.count() do
 end
 -- }}}
 
--- {{{ Menu --TODO Modify later
+-- {{{ Menu --TODO Modify menu
 -- Create a laucher widget and a main menu
 myawesomemenu = {
    { "manual", terminal .. " -e man awesome" },
@@ -243,7 +249,7 @@ memwidget = lain.widgets.mem({
     end
 })
 
--- MPD widget --TODO learn how to use mpd
+-- MPD widget
 mpdicon = wibox.widget.imagebox()
 mpdwidget = lain.widgets.mpd({
     settings = function()
@@ -274,21 +280,8 @@ spacer = wibox.widget.textbox(" ")
 --[[ My own widgets
 --Create widget of volume
 mytextvolume = create_volume_widget_text()
-
---Create widget of battery
---Is not working
-batterywidget = wibox.widget.textbox()
-batterywidget:set_text(" | Battery | ")
-batterywidgettimer = timer({ timeout = 5 })
-batterywidgettimer:connect_signal("timeout",
-    function()
-        fh = assert(io.popen("acpi | cut -d, -f 2,3 -", "r"))
-        batterywidget:set_text(" |" .. fh:read("*l") .. " | ")
-        fh:close()
-    end
-)
---batterywidgettimer:start()
 -- ]]
+
 -- }}}
 
 -- {{{ Layout
@@ -398,7 +391,6 @@ for s = 1, screen.count() do
     right_layout:add(batwidget)
     right_layout:add(clockicon)
     right_layout:add(mytextclock)
-    --right_layout:add(mylayoutbox[s])
 
     -- Now bring it all together (with the tasklist in the middle)
     local layout = wibox.layout.align.horizontal()
@@ -458,8 +450,7 @@ globalkeys = awful.util.table.join(
             if client.focus then client.focus:raise() end
         end, "Focus previous window"),
 
-    --By direction manipulation
-    --TODO add keydocs or delete
+    --By direction manipulation, recomended for centerwork layout
     awful.key({ altkey }, "j",
         function()
             awful.client.focus.bydirection("down")
@@ -487,24 +478,6 @@ globalkeys = awful.util.table.join(
                 client.focus:raise()
             end
         end, "Switch to previous focused client"),
-    
---[[ Old volume control
-    --Keys used to manage volume
---awful.key({ }, "XF86AudioRaiseVolume", function ()
---   awful.util.spawn("amixer set Master 5%+", false) end, "Increase volume"),
---awful.key({ }, "XF86AudioLowerVolume", function ()
---   awful.util.spawn("amixer set Master 5%-", false) end, "Decrease volume"),
---awful.key({ }, "XF86AudioMute", function ()
---   awful.util.spawn("amixer set Master toggle", false) end, "Mute volume"),
-
-
-  awful.key({ }, "XF86AudioRaiseVolume", function ()
-     inc_vol(mytextvolume) end, "Increase volume"),
-  awful.key({ }, "XF86AudioLowerVolume", function ()
-     decr_vol(mytextvolume) end, "Decrease volume"),
-  awful.key({ }, "XF86AudioMute", function ()
-     mute_vol(mytextvolume) end, "Mute volume"),
---]]
 
     keydoc.group("Volume control"),
     awful.key({ }, "XF86AudioRaiseVolume",
@@ -634,7 +607,6 @@ clientkeys = awful.util.table.join(
 -- Bind all key numbers to tags.
 -- Be careful: we use keycodes to make it works on any keyboard layout.
 -- This should map on the top row of your keyboard, usually 1 to 9.
---TODO PUT KEYDOC GUIDE HERE
 for i = 1, 9 do
     globalkeys = awful.util.table.join(globalkeys,
         -- View tag only.

@@ -6,6 +6,7 @@ theme = {}
 
 local path = os.getenv("HOME") .. "/.config/awesome/themes/default"
 local awesome_path = os.getenv("HOME") .. "/.config/awesome"
+local lain_icons   = os.getenv("HOME") .. "/.config/awesome/lain/icons/layout/default/"
 
 theme.font          = "sans 8"
 
@@ -95,6 +96,12 @@ theme.layout_tile = path .. "/layouts/tilew.png"
 theme.layout_tiletop = path .. "/layouts/tiletopw.png"
 theme.layout_spiral  = path .. "/layouts/spiralw.png"
 theme.layout_dwindle = path .. "/layouts/dwindlew.png"
+theme.layout_termfair    = lain_icons .. "termfairw.png"
+--theme.layout_cascade     = lain_icons .. "cascadew.png"
+--theme.layout_cascadetile = lain_icons .. "cascadetilew.png"
+theme.layout_centerwork  = lain_icons .. "centerworkw.png"
+theme.layout_centerfair  = lain_icons .. "centerfairw.png"
+theme.layout_centerhwork = lain_icons .. "centerhworkw.png"
 
 theme.awesome_icon = awesome_path .. "/icons/awesome16.png"
 
