@@ -71,10 +71,8 @@ terminal    = "xfce4-terminal" or "xterm"
 editor      = os.getenv("EDITOR") or "nano"
 editor_cmd  = terminal .. " -e " .. editor
 
---TODO add more default programs
 browser     = "firefox"
 browser1    = "opera"
---ide         = "idea"
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 local layouts =
@@ -127,24 +125,25 @@ for s = 1, screen.count() do
 end
 -- }}}
 
--- {{{ Menu --TODO Modify menu
+-- {{{ Menu
 -- Create a laucher widget and a main menu
 myawesomemenu = {
    { "manual", terminal .. " -e man awesome" },
    { "edit config", editor_cmd .. " " .. awesome.conffile },
-   { "restart", awesome.restart },
-   { "quit", awesome.quit }
 }
 
 --submenu
 myutils = {
-   { "firefox", "firefox" },
-   { "skype", "skype" }
+    { "firefox", "firefox" },
+    { "opera", "opera" },
+    { "skype", "skype" }
 }
 
 mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
                                     { "utils", myutils },
-                                    { "open terminal", terminal }, --entry
+                                    { "open terminal", terminal },
+                                    { "restart", awesome.restart },
+                                    { "quit", awesome.quit },
                                   },
                           theme = { height = 16, width = 130}
                         })
